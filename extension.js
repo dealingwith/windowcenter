@@ -21,58 +21,65 @@ const Main = imports.ui.main;
 const ExtensionUtils = imports.misc.extensionUtils;
 
 class Extension {
-    constructor() {
-    }
+  constructor() {}
 
-    centerWindow() {
-      global.get_window_actors().every((w) => {
-        if (w.meta_window.has_focus()) {
-          var monitorGeometry = Meta.is_wayland_compositor()
-            ? global.workspace_manager
-            .get_active_workspace()
-            .get_work_area_for_monitor(w.meta_window.get_monitor().index)
-            : global.display.get_monitor_geometry(w.meta_window.get_monitor());
+  centerWindow() {
+    global.get_window_actors().every((w) => {
+      if (w.meta_window.has_focus()) {
+        var monitorGeometry = Meta.is_wayland_compositor()
+          ? global.workspace_manager
+              .get_active_workspace()
+              .get_work_area_for_monitor(w.meta_window.get_monitor().index)
+          : global.display.get_monitor_geometry(w.meta_window.get_monitor());
 
-          var monitorUpperLeftX = monitorGeometry.x;
-          var monitorUpperLeftY = monitorGeometry.y;
-          var widthUnit = Math.floor(monitorGeometry.width / 12);
-          var heightUnit = Math.floor(monitorGeometry.height / 12);
+        var monitorUpperLeftX = monitorGeometry.x;
+        var monitorUpperLeftY = monitorGeometry.y;
+        var widthUnit = Math.floor(monitorGeometry.width / 10);
+        var heightUnit = Math.floor(monitorGeometry.height / 12);
 
-          var newWidth = widthUnit*10;
-          var newHeight = heightUnit*10;
+        var newWidth = widthUnit * 6;
+        var newHeight = heightUnit * 10;
 
-          if (w.meta_window.get_maximized()) {
-            w.meta_window.unmaximize(3); // META_MAXIMIZE_BOTH
-          }
-
-          w.meta_window.move_resize_frame(
-            0,
-            monitorUpperLeftX + widthUnit,
-            monitorUpperLeftY + heightUnit,
-            newWidth,
-            newHeight,
-          );
-          return false;
+        if (w.meta_window.get_maximized()) {
+          w.meta_window.unmaximize(3); // META_MAXIMIZE_BOTH
         }
 
-        return true;
-      });
-    }
+        w.meta_window.move_resize_frame(
+          0,
+          monitorUpperLeftX + widthUnit * 2,
+          monitorUpperLeftY + heightUnit,
+          newWidth,
+          newHeight
+        );
+        return false;
+      }
 
-    enable() {
-      let settings = ExtensionUtils.getSettings("org.gnome.shell.extensions.com-thorstenball-windowcenter");
+      return true;
+    });
+  }
 
-      let mode = Shell.ActionMode.NORMAL;
-      let flag = Meta.KeyBindingFlags.NONE;
+  enable() {
+    let settings = ExtensionUtils.getSettings(
+      "org.gnome.shell.extensions.com-thorstenball-windowcenter"
+    );
 
-      Main.wm.addKeybinding("center-window", settings, flag, mode, this.centerWindow);
-    }
+    let mode = Shell.ActionMode.NORMAL;
+    let flag = Meta.KeyBindingFlags.NONE;
 
-    disable() {
-      Main.wm.removeKeybinding("center-window");
-    }
+    Main.wm.addKeybinding(
+      "center-window",
+      settings,
+      flag,
+      mode,
+      this.centerWindow
+    );
+  }
+
+  disable() {
+    Main.wm.removeKeybinding("center-window");
+  }
 }
 
 function init() {
-    return new Extension();
+  return new Extension();
 }
